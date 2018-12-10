@@ -6,7 +6,8 @@ dfTreatment10 <- read.table() #insert filename
 aveTreatment10 <- aggregate(.~t, dfTreatment10,function(x) mean = mean(x))
 
 matrixRowNames <- seq(.1,.9,by=.1)
-contourValues <- matrix(nrow=9,ncol=9)
+contourValuesDisseminated <- matrix(nrow=9,ncol=9)
+contourValuesCumulative <- contourValuesDisseminated
 rownames(contourValues) <- matrixRowNames
 colnames(contourValues) <- matrixRowNames
 
@@ -33,5 +34,8 @@ incifferenceAndRatio <- function(treatment1,treatment2,mtx){ #make this work for
   yLocation <- substr(treatment2, nchar(treatment2)-2, nchar(treatment2))
   yLocation <- paste(".",yLocation)
   mtx[xLocation,yLocation] <- disseminatedDiff
-  #jesus christ will this work??
+  #will this work??
 }
+
+plot = contour(x = matrixRowNames,y = matrixRowNames, contourValues)
+#ggsave()
