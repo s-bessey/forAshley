@@ -40,8 +40,6 @@ riskDiffRatio <- function(treatment){
 }
 
 
-
-
 #need to write total person-years on/off PrEP and the number w/HIV for both
 
 #start with disseminated, then do composite
@@ -51,15 +49,20 @@ riskDiffRatio <- function(treatment){
 #put risk difference at matrix["a","b"]
 #put negative of risk difference at matrix["b","a"]
 
-differenceAndRatio <- function(treatment1,treatment2,mtx){ #make this work for disseminated and composite
+differenceAndRatioContours <- function(treatment1,treatment2,mtx1,mtx2){ #make this work for disseminated and composite
   avg1 <- aggregate(.~t, treatment1,function(x) mean = mean(x))
   disseminatedDiff <- riskdifference(treatment1$HIV_noPrEP,treatment2$HIV_noPrEP,
                                      treatment1$noPrEP,treatment2$noPrEP)
+  compositeDiff <- riskdifference(treatment$HIV_PrEP,treatment$HIV_control,
+                                  treatment$PrEP,treatment$control)
   xLocation <- substr(treatment1, nchar(treatment1)-2, nchar(treatment1)-1)
   xLocation <- paste(".",xLocation) #may not need this if coverage is decimal?
   yLocation <- substr(treatment2, nchar(treatment2)-2, nchar(treatment2))
   yLocation <- paste(".",yLocation) #see above
-  mtx[xLocation,yLocation] <- disseminatedDiff
+  mtx1[xLocation,yLocation] <- disseminatedDiff
+  mtx1[yLocation,xLocation] <- -disseminatedDiff
+  mtx2[xLocation,yLocation] <- compositeDiff
+  mtx2[ylocation,xLocation] <- -compositeDiff
   #will this work??
 }
 
