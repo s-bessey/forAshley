@@ -1,4 +1,6 @@
 library("fmsb")
+#inlibrary("knitr")
+library("dplyr")
 #import files
 
 dfTreatment10 <- read.table() #insert filename
@@ -12,6 +14,10 @@ rownames(contourValues) <- matrixRowNames
 colnames(contourValues) <- matrixRowNames
 
 #risk ratios and risk differences for disseminated
+table2 <- as.data.frame(matrix(nrow = 4, ncol = 5))
+colnames(table2) <- c('Effect', 'RD', '95% CI','RR','95% CI')
+table2$Effect <- c('Direct','Disseminated','Composite','Overall')
+
 
 riskDiffRatio <- function(treatment){
   
@@ -37,8 +43,12 @@ riskDiffRatio <- function(treatment){
   assign(print("compositeDiff",naming, sep=""),compositeDiff)
   assign(print("overallRatio",naming, sep=""),compositeRatio)
   
+  
 }
 
+riskDiffRatio(aveTreatment10)
+
+tab_df(df,title = "Contours", col.header = matrixRowNames, show.rownames = T, alternate.rows = T,file="test.doc")
 
 #need to write total person-years on/off PrEP and the number w/HIV for both
 
