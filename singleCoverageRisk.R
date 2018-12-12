@@ -1,18 +1,38 @@
 # This code will generate tables 2 and 4, plus figures 3 and 4. All comparisons 
 # are to the control case (here no PrEP)
 
+
+#have to have cum and prev ave first
 table2 <- as.data.frame(matrix(nrow = 4, ncol = 5))
 colnames(table2) <- c('Effect', 'RD', '95% CI','RR','95% CI')
 table2$Effect <- c('Individual','Disseminated','Composite','Overall')
+table4 <- table2
 
-
-riskDiffRatio <- function(treatment){
+riskDiffRatioT2 <- function(treatment){ #give the file of endtime data
+  # and prevalence or incidence
   
-  naming <- substr(treatment, nchar(treatment)-2,nchar(treatment))
+  naming2 <- print(substr(treatment, nchar(treatment)-2,nchar(treatment)),
+                  "Prev", sep = "")
+  naming4 <- print(substr(treatment, nchar(treatment)-2,nchar(treatment)),
+                   "Inc", sep = "")
   
-  individualDiff <- riskdifference(treatment$HIV_PrEP,treatment$HIV_noPrEP,
-                             treatment$PrEP,treatment$noPrEP)
-  individualRatio <- riskratio(treatment$HIV_PrEP,treatment$HIV_noPrEP,
+  N_11 <- treatment$PrEP # number of people on PrEP
+  HIV_11 <- treatment$N_HIV_PrEP # prevalence of HIV+ PrEP-users
+  Inc_11 <- treatment$Inc_HIV_PrEP # incidence of HIV in PrEP users
+    
+  N_01 <- treatment$N_noPrEP # number of people not on PrEP in treatment gp
+  HIV_01 <- treatment$HIV_noPreP # HIV+ people not on PrEP in treatment gp
+  Inc_01 <- treatment$Inc_HIV_noPrEP # HIV incidence in no-PrEP treatment gp
+  
+  N_00 <- treatment$N_control # population of control gp
+  HIV_00 <- treatment$HIV_control # HIV prevalence in control
+  Inc_00 <- treatment$Inc_control # HIV incidence in control
+  
+  
+  
+  individualDiff <- riskdifference(treatment$HIV_PrEP_prev,treatment$HIV_noPrEP_prev,
+                             treatment$PrEP_prev,treatment$noPrEP_prev)
+  individualRatio <- riskratio(treatment$HIV_PrEP_prev,treatment$HIV_noPrEP_prev,
                                treatment$PrEP,treatment$noPrEP)
   assign(print("individulaDiff",naming,sep=""),individualDiff)
   assign(print("individulaRatui",naming,sep=""),individualRatio)
@@ -38,15 +58,14 @@ riskDiffRatio <- function(treatment){
                               treatment$PrEP,treatment$control)
   assign(print("compositeDiff",naming, sep=""),compositeDiff)
   assign(print("overallRatio",naming, sep=""),compositeRatio)
-  
-  
 }
 
 riskDiffRatio(aveTreatment10)
+#make data frame for prevalence
 table2[1,2] <- individualDiff$estimate #rename all of these with proper % data
-table2[1,3] <- individualDiff$conf.int
+table2[1,3] <- paste(individualDiff$conf.int[1],individualDiff$conf.int[2])
 table2[1,4] <- individualRatio$estimate
-table2[1,5] <- individualRatio$conf.int
+table2[1,5] <- paste(individualRatio$conf.int[1],individualRatio$conf.int[2])
 
 table2[2,2] <- disseminatedDiff$estimate
 table2[2,3] <- disseminatedDiff$conf.int
