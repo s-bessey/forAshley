@@ -30,34 +30,69 @@ riskDiffRatioT2 <- function(treatment){ #give the file of endtime data
   
   
   
-  individualDiff <- riskdifference(treatment$HIV_PrEP_prev,treatment$HIV_noPrEP_prev,
-                             treatment$PrEP_prev,treatment$noPrEP_prev)
-  individualRatio <- riskratio(treatment$HIV_PrEP_prev,treatment$HIV_noPrEP_prev,
-                               treatment$PrEP,treatment$noPrEP)
-  assign(print("individulaDiff",naming,sep=""),individualDiff)
-  assign(print("individulaRatui",naming,sep=""),individualRatio)
+  individualDiff <- riskdifference(HIV_11,HIV_01,
+                             N_11,N_01)
+  individualRatio <- riskratio(HIV_11,HIV_01,
+                               N_11,N_01)
+  assign(paste("individualDiff",naming2,sep=""),individualDiff)
+  assign(paste("individualRatio",naming2,sep=""),individualRatio)
   
-  dissDiff <- riskdifference(treatment$HIV_noPrEP,treatment$HIV_control,
-                             treatment$noPrEP,treatment$control)
-  dissRatio <- riskratio(treatment$HIV_noPrEP,treatment$HIV_control,
-                         treatment$noPrEP,treatment$control)
+  indIncDiff <- riskdifference(Inc_11,Inc_01,
+                                N_11,N_01)
+  indIncRatio <- riskratio(Inc_11,Inc_01,
+                                N_11,N_01)
+  assign(paste("individualDiff",naming4,sep=""),indIncDiff)
+  assign(paste("individualRatio",naming4,sep=""),indIncRatio)
   
-  assign(print("disseminatedDiff",naming, sep=""),dissDiff)
-  assign(print("disseminatedRatio",naming, sep=""),dissRatio)
+
+  dissDiff <- riskdifference(HIV_01,HIV_00,
+                             N_01,N_00)
+  dissRatio <- riskratio(HIV_01,HIV_00,
+                         N_01,N_00)
   
-  overallDiff <- riskdifference(treatment$HIV,treatment$HIV_control,
-                                (treatment$PrEP+treatment$noPrEP),treatment$control)
-  overallRatio <- riskratio(treatment$HIV,treatment$HIV_control,
-                            (treatment$PrEP+treatment$noPrEP),treatment$control)
-  assign(print("overallDiff",naming, sep=""),overallDiff)
-  assign(print("overallRatio",naming, sep=""),overallRatio)
+  assign(paste("disseminatedDiff",naming2, sep=""),dissDiff)
+  assign(paste("disseminatedRatio",naming2, sep=""),dissRatio)
   
-  compositeDiff <- riskdifference(treatment$HIV_PrEP,treatment$HIV_control,
-                                  treatment$PrEP,treatment$control)
-  compositeRatio <- riskratio(treatment$HIV_PrEP,treatment$HIV_control,
-                              treatment$PrEP,treatment$control)
-  assign(print("compositeDiff",naming, sep=""),compositeDiff)
-  assign(print("overallRatio",naming, sep=""),compositeRatio)
+  dissIncDiff <- riskdifference(Inc_01,Inc_00,
+                             N_01,N_00)
+  dissIncRatio <- riskratio(Inc_01,Inc_00,
+                         N_01,N_00)
+  
+  assign(paste("disseminatedDiff",naming4, sep=""),dissIncDiff)
+  assign(paste("disseminatedRatio",naming4, sep=""),dissIncRatio)
+
+  
+  overallDiff <- riskdifference((HIV_11+HIV_01),HIV_00,
+                                (N_11+N_01),N_00)
+  overallRatio <- riskratio((HIV_11+HIV_01),HIV_00,
+                            (N_11+N_01),N_00)
+  
+  assign(print("overallDiff",naming2, sep=""),overallDiff)
+  assign(print("overallRatio",naming2, sep=""),overallRatio)
+  
+  overallIncDiff <- riskdifference((Inc_11+Inc_01),Inc_00,
+                                   (N_11+N_01),N_00)
+  overallIncRatio <- riskratio((Inc_11+Inc_01),Inc_00,
+                            (N_11+N_01),N_00)
+  
+  assign(print("overallDiff",naming4, sep=""),overallIncDiff)
+  assign(print("overallRatio",naming4, sep=""),overallIncRatio)
+  
+  compositeDiff <- riskdifference(HIV_11,HIV_00,
+                                  N_11,N_00)
+  compositeRatio <- riskratio(HIV_11,HIV_00,
+                              N_11,N_00)
+  
+  assign(print("compositeDiff",naming2, sep=""),compositeDiff)
+  assign(print("overallRatio",naming2, sep=""),compositeRatio)
+  
+  compositeIncDiff <- riskdifference(Inc_11,Inc_00,
+                                  N_11,N_00)
+  compositeRatio <- riskratio(Inc_11,Inc_00,
+                              N_11,N_00)
+  assign(print("compositeDiff",naming4, sep=""),compositeIncDiff)
+  assign(print("overallRatio",naming4, sep=""),compositeIncRatio)
+  
 }
 
 riskDiffRatio(aveTreatment10)
