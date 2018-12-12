@@ -8,7 +8,7 @@ colnames(table2) <- c('Effect', 'RD', '95% CI','RR','95% CI')
 table2$Effect <- c('Individual','Disseminated','Composite','Overall')
 table4 <- table2
 
-riskDiffRatioT2 <- function(treatment){ #give the file of endtime data
+riskDiffRatioT2 <- function(treatment,tbl1,tbl2){ #give the file of endtime data
   # and prevalence or incidence
   
   naming2 <- print(substr(treatment, nchar(treatment)-2,nchar(treatment)),
@@ -29,38 +29,56 @@ riskDiffRatioT2 <- function(treatment){ #give the file of endtime data
   Inc_00 <- treatment$Inc_control # HIV incidence in control
   
   
-  
+  # create differences and ratios for both prevalence and incidence,
+  # 
   individualDiff <- riskdifference(HIV_11,HIV_01,
                              N_11,N_01)
+  tbl1[1,2] <- individualDiff$estimate
+  tbl1[1,3] <- paste(individualDiff$conf.int[1],individualDiff$conf.int[2])
   individualRatio <- riskratio(HIV_11,HIV_01,
                                N_11,N_01)
+  tbl1[1,4] <- individualRatio$estimate
+  tbl1[1,5] <- paste(individualRatio$conf.int[1],individualRatio$conf.int[2])
   assign(paste("individualDiff",naming2,sep=""),individualDiff)
   assign(paste("individualRatio",naming2,sep=""),individualRatio)
   
   indIncDiff <- riskdifference(Inc_11,Inc_01,
                                 N_11,N_01)
+  tbl2[1,2] <- individualIncDiff$estimate
+  tbl2[1,3] <- paste(individualIncDiff$conf.int[1],individualIncDiff$conf.int[2])
   indIncRatio <- riskratio(Inc_11,Inc_01,
                                 N_11,N_01)
+  tbl2[1,4] <- individualIncRatio$estimate
+  tbl2[1,5] <- paste(individualIncRatio$conf.int[1],individualIncRatio$conf.int[2])
   assign(paste("individualDiff",naming4,sep=""),indIncDiff)
   assign(paste("individualRatio",naming4,sep=""),indIncRatio)
   
 
   dissDiff <- riskdifference(HIV_01,HIV_00,
                              N_01,N_00)
+  tbl1[2,2] <- dissDiff$estimate
+  tbl1[2,3] <- paste(dissDiff$conf.int[1],dissDiff$conf.int[2])
   dissRatio <- riskratio(HIV_01,HIV_00,
                          N_01,N_00)
+  tbl1[2,4] <- dissRatio$estimate
+  tbl1[2,5] <- paste(dissRatio$conf.int[1],dissRatio$conf.int[2])
   
   assign(paste("disseminatedDiff",naming2, sep=""),dissDiff)
   assign(paste("disseminatedRatio",naming2, sep=""),dissRatio)
   
   dissIncDiff <- riskdifference(Inc_01,Inc_00,
                              N_01,N_00)
+  tbl2[2,2] <- dissIncDiff$estimate
+  tbl2[2,3] <- paste(dissIncDiff$conf.int[1],dissIncDiff$conf.int[2])
   dissIncRatio <- riskratio(Inc_01,Inc_00,
                          N_01,N_00)
+  tbl2[2,4] <- dissIncRatio$estimate
+  tbl2[2,5] <- paste(dissIncRatio$conf.int[1],dissIncRatio$conf.int[2])
   
   assign(paste("disseminatedDiff",naming4, sep=""),dissIncDiff)
   assign(paste("disseminatedRatio",naming4, sep=""),dissIncRatio)
 
+  # everything under this needs correction
   
   overallDiff <- riskdifference((HIV_11+HIV_01),HIV_00,
                                 (N_11+N_01),N_00)
@@ -92,7 +110,6 @@ riskDiffRatioT2 <- function(treatment){ #give the file of endtime data
                               N_11,N_00)
   assign(print("compositeDiff",naming4, sep=""),compositeIncDiff)
   assign(print("overallRatio",naming4, sep=""),compositeIncRatio)
-  
 }
 
 riskDiffRatio(aveTreatment10)
