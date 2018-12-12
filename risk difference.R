@@ -1,5 +1,5 @@
 library("fmsb")
-#inlibrary("knitr")
+library("knitr")
 library("dplyr")
 #import files
 
