@@ -16,43 +16,46 @@ riskDiffRatio <- function(treatment,tbl1,tbl2){ #give the file of endtime data
   naming4 <- paste(treatment$coverage[1],
                    "Inc", sep = "")
   
-  N_11 <- treatment$PrEP # number of people on PrEP
-  HIV_11 <- treatment$N_HIV_PrEP # prevalence of HIV+ PrEP-users
-  Inc_11 <- treatment$Inc_HIV_PrEP # incidence of HIV in PrEP users
+  N_11 <- treatment$N_PrEP[treatment$t == max(treatment$t)] # number of people on PrEP
+  HIV_11 <- treatment$N_HIV_PrEP[treatment$t == max(treatment$t)] # prevalence of HIV+ PrEP-users
+  Inc_11 <- treatment$N_HIV_PrEP[treatment$t == max(treatment$t)] -
+    treatment$N_HIV_PrEP[treatment$t == 0] #cum incidence of HIV in PrEP users
     
-  N_01 <- treatment$N_noPrEP # number of people not on PrEP in treatment gp
-  HIV_01 <- treatment$HIV_noPreP # HIV+ people not on PrEP in treatment gp
-  Inc_01 <- treatment$Inc_HIV_noPrEP # HIV incidence in no-PrEP treatment gp
+  N_01 <- treatment$N_noPrEP[treatment$t == max(treatment$t)] # number of people not on PrEP in treatment gp
+  HIV_01 <- treatment$HIV_noPreP[treatment$t == max(treatment$t)] # HIV+ people not on PrEP in treatment gp
+  Inc_01 <- treatment$Inc_HIV_noPrEP[treatment$t == max(treatment$t)] -
+    treatment$N_HIV_PrEP[treatment$t == 0] # HIV incidence in no-PrEP treatment gp
   
-  N_00 <- treatment$N_control # population of control gp
-  HIV_00 <- treatment$HIV_control # HIV prevalence in control
-  Inc_00 <- treatment$Inc_control # HIV incidence in control
+  N_00 <- treatment$N_control[treatment$t == max(treatment$t)] # population of control gp
+  HIV_00 <- treatment$HIV_control[treatment$t == max(treatment$t)] # HIV prevalence in control
+  Inc_00 <- treatment$Inc_control[treatment$t == max(treatment$t)] -
+    treatment$N_HIV_PrEP[treatment$t == 0] # HIV incidence in control
   
   
   # create differences and ratios for both prevalence and incidence,
   # 
-  individualDiff <- riskdifference(HIV_11[HIV_11$t == max(x$t)],HIV_01[HIV_11$t == max(x$t)],
-                             N_11[HIV_11$t == max(x$t)],N_01[HIV_11$t == max(x$t)])
+  individualDiff <- riskdifference(HIV_11,HIV_01,
+                             N_11,N_01)
   tbl1[1,2] <- ave(individualDiff$estimate)[1]
   tbl1[1,3] <- paste(quantile(individualDiff$estimate, probs = .025),
                      quantile(individualDiff$estimate, probs = .975)) #find simulation intervals (2.5 and 97.5 percentiles)
-  individualRatio <- riskratio(HIV_11[HIV_11$t == max(x$t)],HIV_01[HIV_11$t == max(x$t)],
-                               N_11[HIV_11$t == max(x$t)],N_01[HIV_11$t == max(x$t)])
+  individualRatio <- riskratio(HIV_11,HIV_01,
+                               N_11,N_01)
   tbl1[1,4] <- ave(individualRatio$estimate)[1]
   tbl1[1,5] <- paste(quantile(individualRatio$estimate, probs = .025),
                      quantile(individualRatio$estimate, probs = .975))
   assign(paste("individualDiff",naming2,sep=""),individualDiff)
   assign(paste("individualRatio",naming2,sep=""),individualRatio)
   
-  indIncDiff <- riskdifference(HIV_11[HIV_11$t == max(x$t)] - HIV_11[HIV_11$t == 0], #incidence (subtract initial HIV pop)
-                 HIV_01[HIV_01$t == max(x$t)] - HIV_01[HIV_01$t == 0], #incidence
+  individualIncDiff <- riskdifference(Inc_11, #incidence (subtract initial HIV pop)
+                 Inc_01, #incidence
                  N_11[HIV_11$t != 0],N_01[HIV_11$t != 0])
   tbl2[1,2] <- individualIncDiff$estimate
   tbl2[1,3] <- paste(quantile(individualIncDiff$estimate, probs = .025),
                      quantile(individualIncDiff$estimate, probs = .975))
-  indIncRatio <- riskratio(HIV_11[HIV_11$t == max(x$t)] - HIV_11[HIV_11$t == 0], #incidence (subtract initial HIV pop)
-                           HIV_01[HIV_01$t== max(x$t)] - HIV_01[HIV_01$t == 0], #incidence
-                           N_11[HIV_11$t == max(x$t)],N_01[HIV_11$t == max(x$t)])
+  indIncRatio <- riskratio(Inc_11, #incidence (subtract initial HIV pop)
+                           Inc_01, #incidence
+                           N_11,N_01)
   tbl2[1,4] <- ave(individualIncRatio$estimate)[1]
   tbl2[1,5] <- paste(quantile(individualIncRatio$estimate, probs = .025),
                      quantile(individualIncRatio$estimate, probs = .975))
@@ -60,13 +63,13 @@ riskDiffRatio <- function(treatment,tbl1,tbl2){ #give the file of endtime data
   assign(paste("individualRatio",naming4,sep=""),indIncRatio)
   
 
-  dissDiff <- riskdifference(HIV_01[HIV_01$t == max(x$t)],HIV_00[HIV_00 == max(x$t)],
+  dissDiff <- riskdifference(HIV_01,HIV_00,
                              N_01,N_00)
   tbl1[2,2] <- dissDiff$estimate
   tbl1[2,3] <- paste(quantile(dissDiff$estimate, probs = .025),
                      quantile(dissDiff$estimate, probs = .975))
   
-  dissRatio <- riskratio(HIV_01[HIV_01$t == max(x$t)],HIV_00[HIV_00 == max(x$t)],
+  dissRatio <- riskratio(HIV_01,HIV_00,
                          N_01,N_00)
   tbl1[2,4] <- dissRatio$estimate
   tbl1[2,5] <- paste(quantile(dissRatio$estimate, probs = .025),
@@ -75,15 +78,15 @@ riskDiffRatio <- function(treatment,tbl1,tbl2){ #give the file of endtime data
   assign(paste("disseminatedDiff",naming2, sep=""),dissDiff)
   assign(paste("disseminatedRatio",naming2, sep=""),dissRatio)
   
-  dissIncDiff <- riskdifference(HIV_01[HIV_01$t == max(x$t)]-HIV_01[HIV_01$t == 0],
-                                HIV_00[HIV_00 == max(x$t)] - HIV_00[HIV_00 == 0],
+  dissIncDiff <- riskdifference(Inc_01,
+                                Inc_00,
                                 N_01,N_00)
   tbl2[2,2] <- ave(dissIncDiff$estimate)[1]
   tbl2[2,3] <- paste(quantile(dissIncRatio$estimate, probs = .025),
                      quantile(dissIncRatio$estimate, probs = .975))
   
-  dissIncRatio <- riskratio(HIV_01[HIV_01$t == max(x$t)]-HIV_01[HIV_01$t == 0],
-                            HIV_00[HIV_00 == max(x$t)] - HIV_00[HIV_00 == 0],
+  dissIncRatio <- riskratio(Inc_01,
+                            Inc_00,
                             N_01,N_00)
   tbl2[2,4] <- ave(dissIncRatio$estimate)[1]
   tbl2[2,5] <-   tbl1[2,2] <- dissDiff$estimate
@@ -95,28 +98,28 @@ riskDiffRatio <- function(treatment,tbl1,tbl2){ #give the file of endtime data
 
   # everything under this needs correction
   
- # need to loop at data overallDiff <- riskdifference((HIV_11+HIV_01),HIV_00,
-   #                             (N_11+N_01),N_00)
- # overallRatio <- riskratio((HIV_11+HIV_01),HIV_00,
-   #                         (N_11+N_01),N_00)
+  overallDiff <- riskdifference((HIV_11+HIV_01),HIV_00,
+                                (N_11+N_01),N_00)
+  overallRatio <- riskratio((HIV_11+HIV_01),HIV_00,
+                            (N_11+N_01),N_00)
   
- # assign(print("overallDiff",naming2, sep=""),overallDiff)
- # assign(print("overallRatio",naming2, sep=""),overallRatio)
+  assign(print("overallDiff",naming2, sep=""),overallDiff)
+  assign(print("overallRatio",naming2, sep=""),overallRatio)
   
- # overallIncDiff <- riskdifference((Inc_11+Inc_01),Inc_00,
- #                                  (N_11+N_01),N_00)
- # overallIncRatio <- riskratio((Inc_11+Inc_01),Inc_00,
-#                            (N_11+N_01),N_00)
+  overallIncDiff <- riskdifference((Inc_11+Inc_01),Inc_00,
+                                   (N_11+N_01),N_00)
+  overallIncRatio <- riskratio((Inc_11+Inc_01),Inc_00,
+                            (N_11+N_01),N_00)
   
-#  assign(print("overallDiff",naming4, sep=""),overallIncDiff)
- # assign(print("overallRatio",naming4, sep=""),overallIncRatio)
+  assign(print("overallDiff",naming4, sep=""),overallIncDiff)
+  assign(print("overallRatio",naming4, sep=""),overallIncRatio)
   
-  compositeDiff <- riskdifference(HIV_11[HIV_11$t == max(HIV_11$t)],HIV_00[HIV_00$t == max(HIV_00$t)],
+  compositeDiff <- riskdifference(HIV_11,HIV_00,
                                   N_11,N_00)
   tbl1[3,2] <- ave(compositeDiff$estimate)[1]
   tbl1[3,3] <- paste(quantile(compositeDiff$estimate, probs = .025),
                      quantile(compositeDiff$estimate, probs = .975))
-  compositeRatio <- riskratio(HIV_11[HIV_11$t == max(HIV_11$t)],HIV_00[HIV_00$t == max(HIV_00$t)],
+  compositeRatio <- riskratio(HIV_11,HIV_00,
                               N_11,N_00)
   tbl1[3,4] <- ave(compositeRatio$estimate)[1]
   tbl1[3,5] <- paste(quantile(compositeRatio$estimate, probs = .025),

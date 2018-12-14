@@ -19,32 +19,7 @@ colnames(table2) <- c('Effect', 'RD', '95% CI','RR','95% CI')
 table2$Effect <- c('Direct','Disseminated','Composite','Overall')
 
 
-riskDiffRatio <- function(treatment){
-  
-  naming <- substr(treatment, nchar(treatment)-2,nchar(treatment))
-  dissDiff <- riskdifference(treatment$HIV_noPrEP,treatment$HIV_control,
-                             treatment$noPrEP,treatment$control)
-  dissRatio <- riskratio(treatment$HIV_noPrEP,treatment$HIV_control,
-                         treatment$noPrEP,treatment$control)
-  assign(print("disseminatedDiff",naming, sep=""),dissDiff)
-  assign(print("disseminatedRatio",naming, sep=""),dissRatio)
-  
-  overallDiff <- riskdifference(treatment$HIV,treatment$HIV_control,
-                                  (treatment$PrEP+treatment$noPrEP),treatment$control)
-  overallRatio <- riskratio(treatment$HIV,treatment$HIV_control,
-                              (treatment$PrEP+treatment$noPrEP),treatment$control)
-  assign(print("overallDiff",naming, sep=""),overallDiff)
-  assign(print("overallRatio",naming, sep=""),overallRatio)
-  
-  compositeDiff <- riskdifference(treatment$HIV_PrEP,treatment$HIV_control,
-                                treatment$PrEP,treatment$control)
-  compositeRatio <- riskratio(treatment$HIV_PrEP,treatment$HIV_control,
-                                  treatment$PrEP,treatment$control)
-  assign(print("compositeDiff",naming, sep=""),compositeDiff)
-  assign(print("overallRatio",naming, sep=""),compositeRatio)
-  
-  
-}
+
 
 riskDiffRatio(aveTreatment10)
 
