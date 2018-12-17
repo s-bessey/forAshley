@@ -17,29 +17,36 @@ riskDiffRatio <- function(treatment,tbl1,tbl2,coverage){ #give the file of endti
   N_11 <- treatment$Nprep[treatment$t == 0 & treatment$NprepElig !=0] # number of people on PrEP
   HIV_11 <- integer(length = length(N_11)) # no PrEP users have HIV
   Prev_risk_11 <- HIV_11 / N_11
+  Prev_11_quants <- quantile(Prev_risk_11,probs = .025,.95)
   Inc_11 <- integer(length = length(N_11))
   Inc_risk_11 <- Inc_11 / N_11
+  Inc_11_quants <- quantile(Inc_risk_11,probs = .025,.95)
   
   N_01 <- treatment$NprepElig[treatment$t == 0 & treatment$NprepElig !=0] # number of people not on PrEP in treatment gp
   HIV_01 <- treatment$Nhiv[treatment$t == max(treatment$t) & treatment$NprepElig != 0] # HIV+ people not on PrEP in treatment gp
   Prev_risk_01 <- HIV_01 / N_01
+  Prev_01_quants <- quantile(Prev_risk_01,probs = .025,.95)
   Inc_01 <- treatment$Nnewinf[treatment$t == max(treatment$t) & treatment$NprepElig != 0] # HIV incidence in people in treatment gp with no PrEP
   Inc_risk_01 <- Inc_01 / N_01
+  Inc_01_quants <- quantile(Inc_risk_01,probs = .025,.95)
   
   N_00 <- treatment$totalN[treatment$t == 0 & treatment$NprepElig == 0] # population of control gp
   HIV_00 <- treatment$Nhiv[treatment$t == max(treatment$t) & treatment$NprepElig == 0 &
                              treatment$Nprep == 0] # HIV prevalence in control
   Prev_risk_00 <- HIV_00 / N_00
+  Prev_00_quants <- quantile(Prev_risk_00,probs = .025,.95)
   Inc_00 <- treatment$Nnewinf[treatment$t == max(treatment$t) & treatment$NprepElig == 0 &
                                     treatment$Nprep == 0] # HIV incidence in control
   Inc_risk_00 <- Inc_00 / N_00
+  Inc_00_quants <- quantile(Inc_risk_00,probs = .025,.95)
   
   
   # create differences and ratios for both prevalence and incidence
   # individual prevalence
-  individualDiff <- riskdifference(HIV_11,HIV_01,# individual risk difference
-                             N_11,N_01)
-  tbl1[1,2] <- ave(individualDiff$estimate)[1] #add to table
+  individualDiff <- ave(Prev_risk_11) - ave(Prev_risk_01)
+
+  tbl1[1,2] <- individualDiff #add to table
+  lowerPrevCI
   assign(paste("lowerPrevCI"), quantile(individualDiff$estimate, probs = .025))
   assign(paste("upperPrevCI"),quantile(individualDiff$estimate, probs = .975))
   tbl1[1,3] <- paste(quantile(individualDiff$estimate, probs = .025),
