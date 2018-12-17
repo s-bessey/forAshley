@@ -35,6 +35,8 @@ riskDiffRatio <- function(treatment,tbl1,tbl2){ #give the file of endtime data
   individualDiff <- riskdifference(HIV_11,HIV_01,# individual risk difference
                              N_11,N_01)
   tbl1[1,2] <- ave(individualDiff$estimate)[1] #add to table
+  assign(paste("lowerPrevCI"), quantile(individualIncDiff$estimate, probs = .025))
+  assign(paste("upperPrevCI"),quantile(individualIncDiff$estimate, probs = .975))
   tbl1[1,3] <- paste(quantile(individualDiff$estimate, probs = .025),
                      quantile(individualDiff$estimate, probs = .975)) #find simulation intervals (2.5 and 97.5 percentiles)
   individualRatio <- riskratio(HIV_11,HIV_01, # individual risk ratio
@@ -51,8 +53,10 @@ riskDiffRatio <- function(treatment,tbl1,tbl2){ #give the file of endtime data
                  Inc_01, #incidence
                  N_11[HIV_11$t != 0],N_01[HIV_11$t != 0])
   tbl2[1,2] <- individualIncDiff$estimate # risk difference for incidence
-  tbl2[1,3] <- paste(quantile(individualIncDiff$estimate, probs = .025),
-                     quantile(individualIncDiff$estimate, probs = .975))
+  #confidence intervals
+  assign(paste("lowerIncCI"), quantile(individualIncDiff$estimate, probs = .025))
+  assign(paste("upperIncCI"),quantile(individualIncDiff$estimate, probs = .975))
+  tbl2[1,3] <- paste(lowerIncCI,upperIncCI)
   indIncRatio <- riskratio(Inc_11, #incidence (subtract initial HIV pop)
                            Inc_01, #incidence
                            N_11,N_01)
@@ -146,6 +150,32 @@ riskDiffRatio() #treatment 10%
 #tables
 tab_df(table2, col.header = colnames(table2), show.rownames = F, alternate.rows = T,file="Table2.]\doc")
 tab_df(table4, col.header = colnames(table4), show.rownames = F, alternate.rows = T,file="Table4.]\doc")
-ggplot(individualEffects, aes(x = level, y= estimate)) +
-  geom_ribbon(aes(ymin = CILower,ymax = CIUpper))
 
+
+# figure 3 (incidence)
+fig3Data <- as.data.frame(matrix(nrow = 10, ncol = 4))
+colnames(fig3Data) <- c("level", "estimate","lowerCI","upperCI")
+fig4Data <- fig3Data
+
+figure34dataCreation <- function(treatment){
+  riskDiffRatio(treatment)
+  level <- substr(deparse(substitute(treatment)), nchar(treatment)-1,nchar(treatment))
+  figure3Data[level,1] <- paste('.', level,sep = "")
+  figure3Data[level,2] <- indIncDiff
+  figure3Data[level,3] <- lowerIncCI
+  figure3Data[level,1] <- upperIncCI
+  
+  figure4Data[level,1] <- paste('.', level,sep = "")
+  figure4Data[level,2] <- indPrevDiff
+  figure4Data[level,3] <- lowerPrevCI
+  figure4Data[level,4] <- upperPrevCI
+}
+
+#plot figures 3 and 4
+fig3plot <- ggplot(fig3Data, aes(x = level, y= estimate)) +
+  geom_ribbon(aes(ymin = lowerCI,ymax = upperCI))
+ggsave("Figure_3.eps",fig3plot)
+
+fig4plot <- ggplot(fig4Data, aes(x = level, y= estimate)) +
+  geom_ribbon(aes(ymin = lowerCI,ymax = upperCI))
+ggsave("Figure_4.eps",fig4plot)
