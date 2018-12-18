@@ -1,6 +1,8 @@
 # This code will generate tables 2 and 4, plus figures 3 and 4. All comparisons 
 # are to the control case (here no PrEP)
-library("fmsb")
+## notes: need to make separate function for all estimators (include quantiles)
+## then: through this, do risk calculations
+# also need to add all to separate table for plotting?
 
 #have to have cum and prev ave first
 table2 <- as.data.frame(matrix(nrow = 4, ncol = 5))
@@ -52,41 +54,39 @@ riskDiffRatio <- function(treatment,tbl1,tbl2,coverage){ #give the file of endti
   # create differences and ratios for both prevalence and incidence
   # individual prevalence
   individualDiff <- ave(Prev_risk_11)[1] - ave(Prev_risk_01)[1]
-
-
   tbl1[1,2] <- individualDiff #add to table
   #lowerPrevCI
-  assign(paste("lowerPrevCI"), quantile(individualDiff$estimate, probs = .025))
-  assign(paste("upperPrevCI"),quantile(individualDiff$estimate, probs = .975))
-  tbl1[1,3] <- paste(quantile(individualDiff$estimate, probs = .025),
-                     quantile(individualDiff$estimate, probs = .975)) #find simulation intervals (2.5 and 97.5 percentiles)
-  individualRatio <- riskratio(HIV_11,HIV_01, # individual risk ratio
-                               N_11,N_01)
-  tbl1[1,4] <- ave(individualRatio$estimate)[1]
-  tbl1[1,5] <- paste(quantile(individualRatio$estimate, probs = .025),
-                     quantile(individualRatio$estimate, probs = .975))
+  lowerPrevCI<-Prev_11_quants[1]-Prev_01_quants[2]
+  upperPrevCI <- Prev_11_quants[2]-Prev_01_quants[1]
+  tbl1[1,3] <- paste(lowerPrevCI,upperPrevCI) #find simulation intervals (2.5 and 97.5 percentiles)
+  individualRatio <- ave(Prev_risk_11)[1]/ave(Prev_risk_01)[1]
+
+  tbl1[1,4] <- individualRatio
+  lowerIncCI <- Prev_11_quants[1]/Prev_01_quants[2]
+  upperIncCI <- Prev_11_quants[2]/Prev_01_quants[1]
+  tbl1[1,5] <- paste(lowerIncCI,upperIncCI)
   assign(paste("individualDiff",naming2,sep=""),individualDiff)
   assign(paste("individualRatio",naming2,sep=""),individualRatio)
 
 
   # incidence individual
-  individualIncDiff <- riskdifference(Inc_11, #incidence (subtract initial HIV pop)
-                 Inc_01, #incidence
-                 N_11,N_01)
-  tbl2[1,2] <- individualIncDiff$estimate # risk difference for incidence
+  individualIncDiff <- ave(Inc_risk_11)[1]-ave(Inc_risk_01)
+  tbl2[1,2] <- individualIncDiff # risk difference for incidence
   #confidence intervals
-  assign(paste("lowerIncCI"), quantile(individualIncDiff$estimate, probs = .025))
-  assign(paste("upperIncCI"),quantile(individualIncDiff$estimate, probs = .975))
+  lowerIncCI <- Inc_11_quants[1]-Inc_01_quants[2]
+  upperIncCI <- Inc_11_quants[2]-Inc_01_quants[1]
   tbl2[1,3] <- paste(lowerIncCI,upperIncCI)
-  indIncRatio <- riskratio(Inc_11, #incidence (subtract initial HIV pop)
-                           Inc_01, #incidence
-                           N_11,N_01)
-  tbl2[1,4] <- ave(individualIncRatio$estimate)[1]
-  tbl2[1,5] <- paste(quantile(individualIncRatio$estimate, probs = .025),
-                     quantile(individualIncRatio$estimate, probs = .975))
+  indIncRatio <- ave(Inc_risk_11)[1]/ave(Inc_risk_01)[1]
+  lowerIncCI <- Inc_11_quants[1]/Inc_01_quants[2]
+  upperIncCI <- Inc_11_quants[2]/Inc_01_quants[1]
+  tbl2[1,4] <- individualIncRatio
+  tbl2[1,5] <- paste(lowerIncCI,upperIncCI)
   assign(paste("individualDiff",naming4,sep=""),indIncDiff)
   assign(paste("individualRatio",naming4,sep=""),indIncRatio)
   
+  
+  #-----
+  #fix difference and ratios beyond this point
 # disseminated prevalence risk
   dissDiff <- riskdifference(HIV_01,HIV_00,
                              N_01,N_00)
