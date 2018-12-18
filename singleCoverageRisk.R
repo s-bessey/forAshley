@@ -13,7 +13,7 @@ riskDiffRatio <- function(treatment,tbl1,tbl2,coverage){ #give the file of endti
   #may move the risks down when using estimators
   naming2 <- paste(coverage,"Prev", sep = "") # name for prevalence
   naming4 <- paste(coverage,"Inc", sep = "") # name for incidence
-  
+ 
   N_11 <- treatment$Nprep[treatment$t == 0 & treatment$NprepElig !=0] # number of people on PrEP
   HIV_11 <- integer(length = length(N_11)) # no PrEP users have HIV
   Prev_risk_11 <- HIV_11 / N_11
@@ -21,18 +21,26 @@ riskDiffRatio <- function(treatment,tbl1,tbl2,coverage){ #give the file of endti
   Inc_11 <- integer(length = length(N_11))
   Inc_risk_11 <- Inc_11 / N_11
   Inc_11_quants <- quantile(Inc_risk_11,probs = .025,.95)
-  
-  N_01 <- treatment$NprepElig[treatment$t == 0 & treatment$NprepElig !=0] # number of people not on PrEP in treatment gp
-  HIV_01 <- treatment$Nhiv[treatment$t == max(treatment$t) & treatment$NprepElig != 0] # HIV+ people not on PrEP in treatment gp
+
+  time0 <- subset(treatment,t == 0)
+  time60 <- subset(treatment, t == max(treatment$t))
+  start_01 <- subset(time0, NprepElig != 0) # number of people not on PrEP in treatment gp
+  N_01 <- start_01$NprepElig
+  end_01 <- subset(time60, time0$NprepElig != 0)
+  HIV_01 <- end_01$Nhiv
+
   Prev_risk_01 <- HIV_01 / N_01
   Prev_01_quants <- quantile(Prev_risk_01,probs = .025,.95)
-  Inc_01 <- treatment$Nnewinf[treatment$t == max(treatment$t) & treatment$NprepElig != 0] # HIV incidence in people in treatment gp with no PrEP
+  
+  Inc_01 <- end_01$Nhiv # HIV incidence in people in treatment gp with no PrEP
+
   Inc_risk_01 <- Inc_01 / N_01
   Inc_01_quants <- quantile(Inc_risk_01,probs = .025,.95)
-  
-  N_00 <- treatment$totalN[treatment$t == 0 & treatment$NprepElig == 0] # population of control gp
-  HIV_00 <- treatment$Nhiv[treatment$t == max(treatment$t) & treatment$NprepElig == 0 &
-                             treatment$Nprep == 0] # HIV prevalence in control
+
+
+  N_00 <- treatment$N[treatment$NprepElig == 0 & treatment$Nprep == 0 & treatment$t == 0] # population of control gp
+  HIV_00 <- treatment$Nhiv[treatment$NprepElig == 0 & treatment$Nprep == 0 & treatment$t == 0] # HIV population of control gp
+
   Prev_risk_00 <- HIV_00 / N_00
   Prev_00_quants <- quantile(Prev_risk_00,probs = .025,.95)
   Inc_00 <- treatment$Nnewinf[treatment$t == max(treatment$t) & treatment$NprepElig == 0 &
@@ -40,13 +48,14 @@ riskDiffRatio <- function(treatment,tbl1,tbl2,coverage){ #give the file of endti
   Inc_risk_00 <- Inc_00 / N_00
   Inc_00_quants <- quantile(Inc_risk_00,probs = .025,.95)
   
-  
+
   # create differences and ratios for both prevalence and incidence
   # individual prevalence
-  individualDiff <- ave(Prev_risk_11) - ave(Prev_risk_01)
+  individualDiff <- ave(Prev_risk_11)[1] - ave(Prev_risk_01)[1]
+
 
   tbl1[1,2] <- individualDiff #add to table
-  lowerPrevCI
+  #lowerPrevCI
   assign(paste("lowerPrevCI"), quantile(individualDiff$estimate, probs = .025))
   assign(paste("upperPrevCI"),quantile(individualDiff$estimate, probs = .975))
   tbl1[1,3] <- paste(quantile(individualDiff$estimate, probs = .025),
@@ -58,8 +67,8 @@ riskDiffRatio <- function(treatment,tbl1,tbl2,coverage){ #give the file of endti
                      quantile(individualRatio$estimate, probs = .975))
   assign(paste("individualDiff",naming2,sep=""),individualDiff)
   assign(paste("individualRatio",naming2,sep=""),individualRatio)
-}
- 
+
+
   # incidence individual
   individualIncDiff <- riskdifference(Inc_11, #incidence (subtract initial HIV pop)
                  Inc_01, #incidence
