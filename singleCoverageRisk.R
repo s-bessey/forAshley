@@ -12,7 +12,7 @@ table4 <- table2
 
 riskDiffRatio <- function(riskDF,tbl1,tbl2,coverage){ #give the file of endtime data
   # and prevalence or incidence
-  #may move the risks down when using estimators
+  # may move the risks down when using estimators
   
   naming2 <- paste(coverage,"Prev", sep = "") # name for prevalence
   naming4 <- paste(coverage,"Inc", sep = "") # name for incidence
@@ -68,7 +68,7 @@ riskDiffRatio <- function(riskDF,tbl1,tbl2,coverage){ #give the file of endtime 
   
   #-----
   #fix difference and ratios beyond this point
-# disseminated prevalence risk
+  # disseminated prevalence risk
   dissDiff <- mean(riskDF$risk01_prev) - mean(riskDF$risk00_prev)
 
   tbl1[2,2] <- dissDiff
