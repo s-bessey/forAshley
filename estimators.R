@@ -96,13 +96,12 @@ estimators <- function(treatment,coverage){
 
   #start_01 <- subset(time0, NprepElig != 0) # number of people not on PrEP in treatment gp
   #
+  infectionValues$totalN <- time0$totalN
   #end_01 <- subset(time60, time0$NprepElig != 0)
   infectionValues$N_01 <- time0$NprepElig +time0$Nhiv*time0$treatmentgp
   infectionValues$HIV_01 <- time0$NprepElig - time60$NprepElig + time0$Nhiv*time0$treatmentgp # no. of people who
           # lose prep elig = no. prep elig infected (plus those who started HIV+)
-  assign("test", infectionValues, envir = .GlobalEnv)
-}
-  assign("test", infectionValues$HIV_01, envir = .GlobalEnv)
+
   infectionValues$Inc_01 <- time0$NprepElig - time60$NprepElig # no. of people who
   # lose prep elig = no. prep elig infected
   infectionValues$N_11 <- time0$Nprep # number of people on PrEP
@@ -119,40 +118,51 @@ estimators <- function(treatment,coverage){
 
   K <- with(time0,ave(compID,nseed,FUN = length))
   
-  infectionValues$w_h <-  1/(time0$totalN*K)
+  infectionValues$w_h <-  1/(infectionValues$totalN*K)
   infectionValues$w_i <- 1/N
-  
-  
+ 
+
+
   #find sums for each group
-  sum1 <- tapply(infectionValues$N_trt_group,INDEX = infectionValues$nseed, sum)
-  sum2 <- tapply(infectionValues$N_11*infectionValues$N_trt_group,INDEX = infectionValues$nseed, sum)
-  sum3 <- tapply((1-infectionValues$N_11)*infectionValues$N_trt_group,INDEX = infectionValues$nseed, sum)
-  sum4 <- tapply((1-infectionValues$N_trt_group),INDEX = infectionValues$nseed, sum)
+  weights <- as.data.frame(cbind(infectionValues$nseed,infectionValues$N_trt_group, infectionValues$N_11*infectionValues$N_trt_group,
+                              (1-infectionValues$N_11)*infectionValues$N_trt_group,
+                              1-infectionValues$N_trt_group))
+ 
+  colnames(weights) <- c("nseed", "sum1", "sum2","sum3","sum4")
+  sums1 <- aggregate(.~nseed,weights, function(x) sum = sum(x))
+  sums <- merge(sums1, infectionValues, by = "nseed")
+  #infectionValues$sum1 <- tapply(infectionValues$N_trt_group,INDEX = infectionValues$nseed, sum)
+  
+  
+
   
   #two stage inverse probability weights
-  w11 <- (sum1/N)^(-1) *(sum2/sum1)^(-1)
-  w01 <- (sum1/N)^(-1) * (sum3/sum1)^(-1)
-  w0 <- (sum4/N)^(-1)
-  w1 <- (sum1/N)^(-1)
+  w11 <- (sums$sum1/N)^(-1) *(sums$sum2/sums$sum1)^(-1)
+  
+  w01 <- (sums$sum1/N)^(-1) * (sums$sum3/sums$sum1)^(-1)
+  w0 <- (sums$sum4/N)^(-1)
+  w1 <- (sums$sum1/N)^(-1)
 
 
   #risks
-  risk11_prev <- tapply(w11*w_h*infectionValues$HIV_11*infectionValues$N_11*infectionValues$N_trt_group, infectionValues$nseed, sum)
-  risk01_prev <-tapply(w01*w_h*infectionValues$HIV_01*(1-infectionValues$N_11)*infectionValues$N_trt_group)
-  risk00_prev <-tapply(w0*w_h*infectionValues$HIV_00*(1-infectionValues$N_11)*(1 - infectionValues$N_trt_group), infectionValues$nseed, sum)
-  #risk00_prev <- summarize(group_by(nseed,compID),sum)
-  risk1_prev <-tapply(w1 * w_h * (infectionValues$HIV_11 + infectionValues$HIV_01) * infectionValues$N_trt_group, infectionValues$nseed, sum)
-  risk0_prev <-tapply(w0*w_h*infectionValues$HIV_00*(1 - infectionValues$N_trt_group), infectionValues$nseed, sum)
-  
-  risk11_inc <-tapply(w11*w_h*infectionValues$Inc_11*infectionValues$N_11*infectionValues$N_trt_group, infectionValues$nseed, sum)
-  risk01_inc <-tapply(w01*w_h*infectionValues$Inc_01*(1-infectionValues$N_11)*infectionValues$N_trt_group)
-  risk00_inc <-tapply(w0*w_h*infectionValues$Inc_00*(1-infectionValues$N_11)*(1 - infectionValues$N_trt_group), infectionValues$nseed, sum)
-  
-  risk1_inc <-tapply(w1 * w_h * (infectionValues$Inc_11 + infectionValues$Inc_01) * infectionValues$N_trt_group, infectionValues$nseed, sum)
-  risk0_inc <-tapply(w0*w_h*infectionValues$Inc_00*(1 - infectionValues$N_trt_group), infectionValues$nseed, sum)
-  
+  #risk11_prev <- tapply(w11*w_h*infectionValues$HIV_11*infectionValues$N_11*infectionValues$N_trt_group, infectionValues$nseed, sum)
+  risk11_prev <- w11*infectionValues$w_h*infectionValues$HIV_11*infectionValues$N_11*infectionValues$N_trt_group
+  # risk01_prev <-tapply(w01*w_h*infectionValues$HIV_01*(1-infectionValues$N_11)*infectionValues$N_trt_group)
+  # risk00_prev <-tapply(w0*w_h*infectionValues$HIV_00*(1-infectionValues$N_11)*(1 - infectionValues$N_trt_group), infectionValues$nseed, sum)
+  # 
+  # risk1_prev <-tapply(w1 * w_h * (infectionValues$HIV_11 + infectionValues$HIV_01) * infectionValues$N_trt_group, infectionValues$nseed, sum)
+  # risk0_prev <-tapply(w0*w_h*infectionValues$HIV_00*(1 - infectionValues$N_trt_group), infectionValues$nseed, sum)
+  # 
+  # risk11_inc <-tapply(w11*w_h*infectionValues$Inc_11*infectionValues$N_11*infectionValues$N_trt_group, infectionValues$nseed, sum)
+  # risk01_inc <-tapply(w01*w_h*infectionValues$Inc_01*(1-infectionValues$N_11)*infectionValues$N_trt_group)
+  # risk00_inc <-tapply(w0*w_h*infectionValues$Inc_00*(1-infectionValues$N_11)*(1 - infectionValues$N_trt_group), infectionValues$nseed, sum)
+  # 
+  # risk1_inc <-tapply(w1 * w_h * (infectionValues$Inc_11 + infectionValues$Inc_01) * infectionValues$N_trt_group, infectionValues$nseed, sum)
+  # risk0_inc <-tapply(w0*w_h*infectionValues$Inc_00*(1 - infectionValues$N_trt_group), infectionValues$nseed, sum)
+  assign("test",risk11_prev,envir=.GlobalEnv)
   risk <- cbind(risk11_prev,risk01_prev,risk00_prev,risk1_prev,risk0_prev, risk11_inc,risk01_inc,risk00_inc,risk1_inc,risk0_inc)
   title <- paste("risk", coverage, sep = "")
+  
   assign(title,risk, envir = .GlobalEnv)
 }
 
