@@ -18,25 +18,26 @@ riskDiffRatio <- function(riskDF,tbl1,tbl2,coverage){ #give the file of endtime 
   naming4 <- paste(coverage,"Inc", sep = "") # name for incidence
   
   #quantiles
-  Prev_11_quants <- quantile(riskDF$risk11_prev,probs = c(.025,.975),na.rm = T)
-  Prev_01_quants <- quantile(riskDF$risk01_prev,probs = c(.025,.975),na.rm = T)
-  Prev_00_quants <- quantile(riskDF$risk00_prev,probs = c(.025,.975),na.rm = T)
-  Prev_1_quants <- quantile(riskDF$risk1_prev,probs = c(.025,.975),na.rm = T)
-  
-  Inc_11_quants <- quantile(riskDF$risk11_inc,probs = c(.025,.975),na.rm = T)
-  Inc_01_quants <- quantile(riskDF$risk01_inc,probs = c(.025,.975),na.rm = T)
-  Inc_00_quants <- quantile(riskDF$risk00_inc,probs = c(.025,.975),na.rm = T)
-  Inc_1_quants <- quantile(riskDF$risk1_inc,probs = c(.025,.975),na.rm = T)
+  # get per run risks then quantiles
+  # Prev_11_quants <- quantile(riskDF$risk11_prev,probs = c(.025,.975),na.rm = T)
+  # Prev_01_quants <- quantile(riskDF$risk01_prev,probs = c(.025,.975),na.rm = T)
+  # Prev_00_quants <- quantile(riskDF$risk00_prev,probs = c(.025,.975),na.rm = T)
+  # Prev_1_quants <- quantile(riskDF$risk1_prev,probs = c(.025,.975),na.rm = T)
+  # 
+  # Inc_11_quants <- quantile(riskDF$risk11_inc,probs = c(.025,.975),na.rm = T)
+  # Inc_01_quants <- quantile(riskDF$risk01_inc,probs = c(.025,.975),na.rm = T)
+  # Inc_00_quants <- quantile(riskDF$risk00_inc,probs = c(.025,.975),na.rm = T)
+  # Inc_1_quants <- quantile(riskDF$risk1_inc,probs = c(.025,.975),na.rm = T)
 
   # create differences and ratios for both prevalence and incidence
   # individual prevalence
   #individualDiff <- mean(riskDF$risk11) - mean(riskDF$risk01)
-  individualDiff <- mean(riskDF$risk11_prev) - mean(riskDF$risk01_prev)
-  tbl1[1,2] <- individualDiff #add to table
+  individualDiff <- riskDF$risk11_prev - riskDF$risk01_prev
+  tbl1[1,2] <- ave(individualDiff) #add to table
 
 
   #lowerPrevCI
-  lowerPrevCI<-Prev_11_quants[1]-Prev_01_quants[2]
+  lowerPrevCI<-quantile(individualDiff, probs = c(.025, .975))
   upperPrevCI <- Prev_11_quants[2]-Prev_01_quants[1]
   tbl1[1,3] <- paste(lowerPrevCI,upperPrevCI) #find simulation intervals (2.5 and 97.5 percentiles)
   assign(paste("individualDiff",naming2,sep=""),c(individualDiff,lowerPrevCI,upperPrevCI), envir = .GlobalEnv)
