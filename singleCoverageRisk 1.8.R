@@ -1,26 +1,26 @@
 # This code will generate tables 2 and 4, plus figures 3 and 4. All comparisons 
 # are to the control case (here no PrEP)
-## notes: need to make separate function for all estimators (include quantiles)
-## then: through this, do risk calculations
-# also need to add all to separate table for plotting?
+
 install.packages("sjPlot")
 library(sjPlot)
-#have to have cum and prev ave first
+library(grDevices)
+
+#change color of CI fill here
+fillcolor <- "#230FCB"
+
 table2 <- as.data.frame(matrix(nrow = 4, ncol = 5))
 colnames(table2) <- c('Effect', 'RD', '95% SI','RR','95% SI')
 table2$Effect <- c('Direct','Disseminated','Composite','Overall')
 table4 <- table2
 
-riskDiffRatio <- function(riskDF,tbl1,tbl2,coverage){ #give the file of endtime data
-  # and prevalence or incidence
-  # may move the risks down when using estimators
+riskDiffRatio <- function(riskDF,tbl1,tbl2,coverage){ 
   
   naming2 <- paste(coverage,"Prev", sep = "") # name for prevalence
   naming4 <- paste(coverage,"Inc", sep = "") # name for incidence
   
 # -----
   # individual prevalence
-  #individualDiff <- mean(riskDF$risk11) - mean(riskDF$risk01)
+
   individualDiff <- riskDF$risk11_prev - riskDF$risk01_prev
   tbl1[1,2] <-round(mean(individualDiff),2) #add to table
 
@@ -37,7 +37,7 @@ riskDiffRatio <- function(riskDF,tbl1,tbl2,coverage){ #give the file of endtime 
   upperCI <- CI[2]
   tbl1[1,5] <- paste(lowerCI,upperCI)
   
-  #assign(paste("individualRatio",naming2,sep=""),mean(individualRatio), lowerCI, upperCI)
+
 
 
   # incidence individual
@@ -48,7 +48,7 @@ riskDiffRatio <- function(riskDF,tbl1,tbl2,coverage){ #give the file of endtime 
   upperIncCI <- round(quantile(indIncDiff, probs = .975),2)
   tbl2[1,3] <- paste(lowerIncCI,upperIncCI)
   #assign(paste("individualDiff",naming4,sep=""),indIncDiff)
-  assign(paste("fig3", coverage, sep = "_"), c(mean(indIncDiff),lowerIncCI,upperIncCI), envir = .GlobalEnv)
+  assign(paste("fig4", coverage, sep = "_"), c(mean(indIncDiff),lowerIncCI,upperIncCI), envir = .GlobalEnv)
   indIncRatio <- riskDF$risk11_inc/riskDF$risk01_inc
   lowerIncCI <- round(quantile(indIncRatio, probs = .025),2)
   upperIncCI <- round(quantile(indIncRatio, probs = .975),2)
@@ -84,7 +84,7 @@ riskDiffRatio <- function(riskDF,tbl1,tbl2,coverage){ #give the file of endtime 
   upperCI <- round(quantile(dissIncDiff, probs = .975),2)
   tbl2[2,3] <- paste(lowerCI,upperCI)
 
-  assign(paste("fig4", coverage, sep = "_"), c(mean(dissIncDiff),lowerCI,upperCI), envir = .GlobalEnv)
+  assign(paste("fig3", coverage, sep = "_"), c(mean(dissIncDiff),lowerCI,upperCI), envir = .GlobalEnv)
   
   dissIncRatio <- riskDF$risk01_inc / riskDF$risk00_inc
   tbl2[2,4] <- round(mean(dissIncRatio),2)
@@ -194,13 +194,18 @@ fig4Data <- as.data.frame(rbind(fig4_10,fig4_20,fig4_30,fig4_40,fig4_50,fig4_60,
 fig4Data <- cbind(level, fig4Data)
 colnames(fig4Data)<-c("level","estimate","lowerCI","upperCI")
 
-
+Iname <- expression(widehat(IE))
+alph <- expression(alpha)
 #plot figures 3 and 4
-fig3plot <- ggplot(fig3Data) + geom_ribbon(aes(ymin=lowerCI, ymax=upperCI, x=level),alpha = 0.3)+geom_line(aes(y=estimate, x=level))+
-  scale_colour_manual("",values="blue")+scale_fill_manual("",values="blue")
+fig3plot <- ggplot(fig3Data) + geom_ribbon(aes(ymin=lowerCI, ymax=upperCI, x=level),alpha = 0.3, fill = fillcolor)+
+  geom_line(aes(y=estimate, x=level))+
+  xlab(expression(paste(alpha,"'",sep = "")))+
+   ylab(expression(widehat(DE)(alpha)))
 
 ggsave("Figure_3.eps",fig3plot)
 
 fig4plot <- ggplot(fig4Data, aes(x = level, y= estimate)) + geom_line() +
-  geom_ribbon(aes(ymin = lowerCI,ymax = upperCI, x = level), alpha = 0.3)
+  geom_ribbon(aes(ymin = lowerCI,ymax = upperCI, x = level), alpha = 0.3) +
+  xlab(expression(paste(alpha,"'",sep = "")))+
+  ylab(expression(widehat(IE)(alpha)))
 ggsave("Figure_4.eps",fig4plot)
