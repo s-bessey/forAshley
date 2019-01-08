@@ -41,9 +41,10 @@ differenceAndRatioContours <- function(risk1,risk2,mtx1,mtx2,mtx3){ #make this w
   overallDiff <- mean(risk1$risk1_inc) - mean(risk2$risk00_inc)
   name1 <- deparse(substitute(risk1))
   name2 <- deparse(substitute(risk2))
-  xLocation <- substr(name1, nchar(name1)-1, nchar(name1)-1)
+  xLocation <- as.numeric(substr(name1, nchar(name1)-1, nchar(name1)-1))
+
   #xLocation <- paste(".",xLocation) #may not need this if coverage is decimal?
-  yLocation <- substr(name2, nchar(name2)-1, nchar(name2)-1)
+  yLocation <- as.numeric(substr(name2, nchar(name2)-1, nchar(name2)-1))
   #yLocation <- paste(".",yLocation) #see above
   mtx1[xLocation,yLocation] <- disseminatedDiff
   #mtx1[yLocation,xLocation] <- -disseminatedDiff
