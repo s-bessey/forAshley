@@ -1,5 +1,7 @@
 # Set plotting parameters
 library(grDevices)
+library(ggthemes)
+library(ggalt)
 
 #change color of CI fill here
 fillcolor <- "#230FCB"
@@ -17,18 +19,30 @@ fig4Data <- as.data.frame(rbind(fig4_10,fig4_20,fig4_30,fig4_40,fig4_50,fig4_60,
 fig4Data <- cbind(coverageLevels, fig4Data)
 colnames(fig4Data)<-c("level","estimate","lowerCI","upperCI")
 
-
+#ggplot() + geom_ribbon(aes(ymin = ribspllower$y, ymax = ribsplupper$y, x = ribspllower$x), fill = fillcolor, alpha = transparency) + geom_line(aes(y=fig3Data$estimate, x=coverageLevels))
 #plot figures 3 and 4
+spl <- as.data.frame(spline(coverageLevels, fig3Data$estimate))
+ribspllower <- as.data.frame(spline(coverageLevels,fig3Data$lowerCI))
+ribsplupper <- as.data.frame(spline(coverageLevels,fig3Data$upperCI))
 fig3plot <- ggplot(fig3Data) + geom_ribbon(aes(ymin=lowerCI, ymax=upperCI, x=coverageLevels),alpha = transparency, fill = fillcolor)+
-  geom_line(aes(y=estimate, x=coverageLevels))+
+  geom_line(aes(y=estimate, x=coverageLevels))+ scale_x_continuous(breaks = seq(.1:.9, by = .1))
   xlab(expression(paste(alpha,"'",sep = "")))+
-  ylab(expression(widehat(DE)(alpha)))
+  ylab(expression(widehat(DE)(alpha))) +
+  theme_classic()
 
 ggsave("Figure_3.pdf",fig3plot)
 
 fig4plot <- ggplot(fig4Data, aes(x = coverageLevels, y= estimate)) + 
   geom_ribbon(aes(ymin = lowerCI,ymax = upperCI, x = coverageLevels), fill = fillcolor, alpha = transparency) +
   geom_line() +
+  xlab(expression(paste(alpha,"'",sep = "")))+ scale_x_continuous(breaks = seq(.1:.9, by = .1))
+  ylab(expression(widehat(IE)(alpha))) +
+  theme_classic() 
+ggsave("Figure_4.pdf",fig4plot)
+
+
+testsmooth <- ggplot() + geom_ribbon(aes(ymin = ribspllower$y, ymax = ribsplupper$y, x = ribspllower$x)) +
+  geom_line(aes(y=fig3Data$estimate, x=fig3Data$coverageLevels))+
   xlab(expression(paste(alpha,"'",sep = "")))+
-  ylab(expression(widehat(IE)(alpha)))
-ggsave("Figure_4.eps",fig4plot)
+  ylab(expression(widehat(DE)(alpha)))
+  
