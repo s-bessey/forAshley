@@ -81,3 +81,10 @@ accumulate <-function(rawData, filetype, col, transp, writefiles) {
   ggsave(paste(dataOutPrev, "Plot", filetype, sep = ""), prevPlot)
 }
 
+
+sc2black$prev <- sc2black$HIV/sc2black$Total
+scb2 <- aggregate(.~t, sc2black, function(x) mean = mean(x))
+sc2 <- ggplot() + geom_line(aes(x = scb2$t, y = scb2$prev, color = "black")) +
+  geom_line(aes(x = scw2$t, y = scw2$prev, color = 'blue')) + 
+  scale_color_discrete(name = "", labels = c("black", "white")) +xlab("time") + 
+  ylab("prevalence")
