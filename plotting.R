@@ -21,9 +21,9 @@ colnames(fig4Data)<-c("level","estimate","lowerCI","upperCI")
 
 #ggplot() + geom_ribbon(aes(ymin = ribspllower$y, ymax = ribsplupper$y, x = ribspllower$x), fill = fillcolor, alpha = transparency) + geom_line(aes(y=fig3Data$estimate, x=coverageLevels))
 #plot figures 3 and 4
-spl <- as.data.frame(spline(coverageLevels, fig3Data$estimate))
-ribspllower <- as.data.frame(spline(coverageLevels,fig3Data$lowerCI))
-ribsplupper <- as.data.frame(spline(coverageLevels,fig3Data$upperCI))
+#spl <- as.data.frame(spline(coverageLevels, fig3Data$estimate))
+#ribspllower <- as.data.frame(spline(coverageLevels,fig3Data$lowerCI))
+#ribsplupper <- as.data.frame(spline(coverageLevels,fig3Data$upperCI))
 fig3plot <- ggplot(fig3Data, aes(x = coverageLevels, y = estimate)) + 
   geom_ribbon(aes(ymin=lowerCI, ymax=upperCI, x=coverageLevels),alpha = transparency, fill = fillcolor)+
   geom_line(size = 1) +
@@ -41,9 +41,4 @@ fig4plot <- ggplot(fig4Data, aes(x = coverageLevels, y= estimate)) +
   theme_classic() 
 ggsave("Figure_4.pdf",fig4plot)
 
-
-testsmooth <- ggplot() + geom_ribbon(aes(ymin = ribspllower$y, ymax = ribsplupper$y, x = ribspllower$x)) +
-  geom_line(aes(y=fig3Data$estimate, x=fig3Data$coverageLevels))+
-  xlab(expression(paste(alpha,"'",sep = "")))+
-  ylab(expression(widehat(DE)(alpha)))
   

@@ -14,7 +14,7 @@ colnames(table2) <- c('Effect', 'RD', '95% SI','RR','95% SI')
 table2$Effect <- c('Direct','Disseminated','Composite','Overall')
 table4 <- table2
 
-riskDiffRatio <- function(riskDF,tbl1,tbl2,coverage){ 
+riskDiffRatio <- function(riskDF,tbl1,tbl2,coverage){
   
   naming2 <- paste(coverage,"Prev", sep = "") # name for prevalence
   naming4 <- paste(coverage,"Inc", sep = "") # name for incidence
@@ -33,7 +33,7 @@ riskDiffRatio <- function(riskDF,tbl1,tbl2,coverage){
   assign(paste("individualDiff",naming2,sep=""),c(mean(individualDiff),lowerPrevCI,upperPrevCI), envir = .GlobalEnv)
   individualRatio <- riskDF$risk11_prev/riskDF$risk01_prev
   tbl1[1,4] <- round(mean(individualRatio),2)
-  CI<-round(quantile(individualRatio, probs = c(.025, .975)),2)
+  CI<-quantile(individualRatio, probs = c(.025, .975))
   lowerCI <- CI[1]
   upperCI <- CI[2]
   tbl1[1,5] <- paste(lowerCI,upperCI)
@@ -43,9 +43,9 @@ riskDiffRatio <- function(riskDF,tbl1,tbl2,coverage){
 
   # incidence individual
   indIncDiff <-riskDF$risk11_inc - riskDF$risk01_inc
-  tbl2[1,2] <- round(mean(indIncDiff),2) # risk difference for incidence
+  tbl2[1,2] <- mean(indIncDiff) # risk difference for incidence
   #confidence intervals
-  lowerIncCI <- round(quantile(indIncDiff, probs = .025),2)
+  lowerIncCI <- quantile(indIncDiff, probs = .025)
   upperIncCI <- round(quantile(indIncDiff, probs = .975),2)
   tbl2[1,3] <- paste(lowerIncCI,upperIncCI)
   #assign(paste("individualDiff",naming4,sep=""),indIncDiff)
@@ -177,11 +177,11 @@ riskDiffRatio(riskDF_90,table2, table4,90)
 setwd("/Volumes/GoogleDrive/My Drive/Networks/Brandon/Model Results/Tables")
 #round table to 2 decimal places
 
-tab_df(table2_30, col.header = colnames(table2), show.rownames = F, alternate.rows = T,file="Table2_30.doc")
-tab_df(table4_30, col.header = colnames(table4), show.rownames = F, alternate.rows = T,file="Table4_30.doc")
+tab_df(table2_30, col.header = colnames(table2), show.rownames = F, alternate.rows = T,file="Table2_30.docx")
+tab_df(table4_30, col.header = colnames(table4), show.rownames = F, alternate.rows = T,file="Table4_30.docx")
 
-tab_df(table2_70, col.header = colnames(table2), show.rownames = F, alternate.rows = T,file="Table2_70.doc")
-tab_df(table4_70, col.header = colnames(table4), show.rownames = F, alternate.rows = T,file="Table4_70.doc")
+tab_df(table2_70, col.header = colnames(table2), show.rownames = F, alternate.rows = T,file="Table2_70.docx")
+tab_df(table4_70, col.header = colnames(table4), show.rownames = F, alternate.rows = T,file="Table4_70.docx")
 
 
 

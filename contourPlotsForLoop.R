@@ -36,25 +36,26 @@ differenceAndRatioContoursTest <- function(mtx1,mtx2,mtx3){
   }
 }
 cols = rev(colorRampPalette(c("slateblue4",'slategray1'))(20))
-cols = rev(colorRampPalette(c('#e66101', '#fdb863', '#b2abd2', '#5e3c99'))(20))
+#cols = rev(colorRampPalette(c('#e66101', '#fdb863', '#b2abd2', '#5e3c99'))(20))
 
-png("DisseminatedContour.png",res=600,height=8.5,width=11,units="in")
-dissContour <- filled.contour(x = coverageLevels, y = coverageLevels, z = as.matrix(contourValuesDisseminated), col = cols,
-                              xlab =expression(alpha), ylab = expression(paste(alpha,"'",sep = "")))
+png("DisseminatedContourFilled.png",res=600,height=8.5,width=11,units="in")
+filled.contour(x = coverageLevels, y = coverageLevels, z = as.matrix(contourValuesDisseminated), xlab =expression(alpha), ylab = expression(paste(alpha,"'",sep = "")))
+#contour(x = coverageLevels, y = coverageLevels, z = as.matrix(contourValuesDisseminated),
+#        xlab =expression(alpha), ylab = expression(paste(alpha,"'",sep = "")))
 dev.off()
 
 
 png("OverallContour.png",res=600,height=8.5,width=11,units="in")
-overallContour <- filled.contour(x = coverageLevels, y = coverageLevels,
-                                 z = as.matrix(contourValuesOverall), col = cols,
-                                 xlab =expression(alpha),
-                                 ylab = expression(paste(alpha,"'",sep = "")))
+filled.contour(x = coverageLevels, y = coverageLevels,
+        z = as.matrix(contourValuesOverall), #col = cols,
+        xlab =expression(alpha),
+        ylab = expression(paste(alpha,"'",sep = "")))
 dev.off()
 
-png("CompositeContour.png")
-compositeContour <- filled.contour(x = coverageLevels, y = coverageLevels,
-                                   z = as.matrix(contourValuesComposite), col = cols,
-                                  xlab =expression(alpha),
-                                  ylab = expression(paste(alpha,"'",sep = "")))
+png("CompositeContourFilled.png",res=600,height=8.5,width=11,units="in")
+filled.contour(x = coverageLevels, y = coverageLevels,
+        z = as.matrix(contourValuesComposite), #col = cols,
+        xlab =expression(alpha),
+        ylab = expression(paste(alpha,"'",sep = "")))
 dev.off()
 

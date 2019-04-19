@@ -15,9 +15,9 @@ table13function <- function(treatment, coverages){
 
   
   time60$HIV_01 <- time0$NprepElig - time60$NprepElig + (time0$Nhiv * time0$treatmentgp)
-  time60$HIV_11 <- (time60$Nhiv * time0$treatmentgp) - time60$HIV_01
+  time60$HIV_11 <- time60$NprepeverHIV
   time60$inc_01 <- time0$NprepElig - time60$NprepElig
-  time60$inc_11 <- (time60$Nnewinf * time0$treatmentgp) - time60$inc_01
+  time60$inc_11 <- time60$NprepeverHIV
   time60$N_11 <- time0$Nprep
   time60$N_01 <- time0$NprepElig
   
@@ -28,14 +28,15 @@ table13function <- function(treatment, coverages){
   HIV_11 <- mean(total_Ns$HIV_11)
   Inc_01 <- mean(total_Ns$inc_01)
   Inc_11 <- mean(total_Ns$inc_11)
-  
+
   t1 <- as.data.frame(cbind(coverages, N_11, HIV_11, HIV_11/N_11, N_01, HIV_01, HIV_01/N_01))
-  colnames(t1) <- c("Component PrEP Coverage Level", "Total Persons", "HIV+", "Point Prevalence, %", "Total Persons", "HIV+", "Point Prevalence, %")
+  #colnames(t1) <- c("Component PrEP Coverage Level", "Total Persons", "HIV+", "Point Prevalence, %", "Total Persons", "HIV+", "Point Prevalence, %")
   t3 <- cbind(coverages, N_11, Inc_11, Inc_11/N_11, N_01, Inc_01, Inc_01/N_01)
+  #colnames(t2)<-c("Component PrEP Coverage Level", "Total Persons", "HIV+", "5-Year Cumulative Incidence", "Total Persons", "HIV+", "5-Year Cumulative Incidence")
   name <- paste("t1",coverages,sep = "_")
   assign(name, as.data.frame(t1), envir = .GlobalEnv)
   name <- paste("t2",coverages,sep = "_")
-  assign(name, as.data.frame(t2), envir = .GlobalEnv)
+  assign(name, as.data.frame(t3), envir = .GlobalEnv)
 }
 
 
@@ -49,13 +50,16 @@ table13function(treatment70, 70)
 table13function(treatment80, 80)
 table13function(treatment90, 90)
 
-
-table1 <- as.data.frame(rbind(t1_10, t1_20, t1_30, t1_40, t1_50, t1_60, t1_70, t1_80, t1_90))
+cname1 <- c("Component PrEP Coverage Level", "Total Persons", "HIV+", "Point Prevalence, %", "Total Persons", "HIV+", "Point Prevalence, %")
+table1 <- as.data.frame(rbind(cname1, t1_10, t1_20, t1_30, t1_40, t1_50, t1_60, t1_70, t1_80, t1_90))
+colnames(table1) <- c("","","Agents on PrEP","","","Agents Not on PrEP","")
 # table1 <- as.data.frame(cbind(treatmentCoverages, table1))
 tab_df(table1, col.header = colnames(table1),
        show.rownames = F, alternate.rows = T,file="Table1.doc")
 
+cname2 <- c("Component PrEP Coverage Level", "Total Persons", "HIV+", "Cumulative Incidence", "Total Persons", "HIV+", "Cumulative Incidence")
 table3 <- as.data.frame(rbind(t2_10, t2_20, t2_30, t2_40, t2_50, t2_60, t2_70, t2_80, t2_90))
 
 tab_df(table3, col.header = colnames(table1),
        show.rownames = F, alternate.rows = T,file="Table3.doc")
+          
