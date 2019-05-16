@@ -2,7 +2,16 @@ N<-11245
 # total number of agents in run isn't in the file, so set it here for ease
 # of changing as necessary
 library(dplyr)
-treatment<- read.table("reduced_24_0.1.txt")
+treatment10<- read.table("reduced_24_0.1.txt",header = T)
+treatment20<- read.table("reduced_24_0.2.txt",header = T)
+treatment30<- read.table("reduced_24_0.3.txt",header = T)
+treatment40<- read.table("reduced_24_0.4.txt",header = T)
+treatment50<- read.table("reduced_24_0.5.txt",header = T)
+treatment60<- read.table("reduced_24_0.6.txt",header = T)
+treatment70<- read.table("reduced_24_0.7.txt",header = T)
+treatment80<- read.table("reduced_24_0.8.txt",header = T)
+treatment90<- read.table("reduced_24_0.9.txt",header = T)
+
 for (i in 1:ncol(treatment)){
   for (j in 1:nrow(treatment)){
     if(is.character(treatment[i,j])){
@@ -308,4 +317,25 @@ riskDF_60<-estimators(treatment60,60)
 riskDF_70<-estimators(treatment70,70)
 riskDF_80<-estimators(treatment80,80)
 riskDF_90<-estimators(treatment90,90)
+
+risk10ave <- lapply(riskDF_10,2,FUN=mean)
+risk20ave <- lapply(riskDF_20,2,FUN=mean)
+risk30ave <- lapply(riskDF_30,2,FUN=mean)
+risk40ave <- lapply(riskDF_40,2,FUN=mean)
+risk50ave <- lapply(riskDF_50,2,FUN=mean)
+risk60ave <- lapply(riskDF_60,2,FUN=mean)
+risk70ave <- lapply(riskDF_70,2,FUN=mean)
+risk80ave <- lapply(riskDF_80,2,FUN=mean)
+risk90ave <- lapply(riskDF_90,2,FUN=mean)
+
+write.table(risk10ave,"risk10.txt",row.names = F)
+write.table(risk20ave,"risk20.txt",row.names = F)
+write.table(risk30ave,"risk30.txt",row.names = F)
+write.table(risk40ave,"risk40.txt",row.names = F)
+write.table(risk50ave,"risk50.txt",row.names = F)
+write.table(risk60ave,"risk60.txt",row.names = F)
+write.table(risk70ave,"risk70.txt",row.names = F)
+write.table(risk80ave,"risk80.txt",row.names = F)
+write.table(risk90ave,"risk90.txt",row.names = F)
+
 
