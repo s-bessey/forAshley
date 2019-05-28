@@ -171,8 +171,13 @@ riskDiffRatio(riskDF_70,table2, table4,70)
 riskDiffRatio(riskDF_80,table2, table4,80)
 riskDiffRatio(riskDF_90,table2, table4,90)
 
-
-
+for (i in 1:(length(listofcoverage))){riskDiffRatio(eval(as.name(listofcoverage[i])),table2,table4,listofcoverage[i])}
+for (i in 1:length(listoftables)){
+  thetable<-eval(as.name(listoftables[i]))
+  flname<-paste(listoftables[i],".doc",sep="")
+  x<-tab_df(x=thetable, show.rownames = F, alternate.rows = T, file = "x.doc")
+  tab_df(eval(as.name(listoftables[1])),alternate.rows = T, file =paste(listoftables[i],".doc",sep=""))}
+tab_df(eval(as.name(listoftables[31])),alternate.rows = T, file =paste(listoftables[31],".doc",sep=""))
 #tables
 setwd("/Volumes/GoogleDrive/My Drive/Networks/Brandon/Model Results/Tables")
 #round table to 2 decimal places
@@ -225,3 +230,10 @@ tab_df(table4_rHalf, col.header = colnames(table4), show.rownames = F, alternate
 tab_df(table2_rDouble, col.header = colnames(table2), show.rownames = F, alternate.rows = T,file="Table2_rDouble.doc")
 tab_df(table4_rDouble, col.header = colnames(table4), show.rownames = F, alternate.rows = T,file="Table4_rDouble.doc")
 
+for (i in listofcoverage){
+  for (j in listofcoverage){
+    if (identical(eval(as.name(i)),eval(as.name(j)))){
+      print(paste(i,j))
+    }
+  }
+}

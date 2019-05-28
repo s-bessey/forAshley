@@ -1,7 +1,7 @@
 differenceAndRatioContoursTest <- function(mtx1,mtx2,mtx3){
   riskNames <- list()
   for (i in 1:9){
-  riskNames[i] <- (paste0("riskDF_",as.character(i),"0"))
+  riskNames[i] <- (paste0("risk",as.character(i),"0"))
   }
   for (i in 1:9){
 
@@ -22,12 +22,12 @@ differenceAndRatioContoursTest <- function(mtx1,mtx2,mtx3){
       xLocation <- as.numeric(substr(name1, nchar(name1)-1, nchar(name1)-1))
       yLocation <- as.numeric(substr(name2, nchar(name2)-1, nchar(name2)-1))
       
-      mtx1[xLocation,yLocation] <- disseminatedDiff
-      mtx1[yLocation,xLocation] <- -disseminatedDiff
-      mtx2[xLocation,yLocation] <- compositeDiff
-      mtx2[yLocation,xLocation] <- -compositeDiff
-      mtx3[xLocation,yLocation] <- overallDiff
-      mtx3[yLocation,xLocation] <- -overallDiff
+      mtx1[xLocation,yLocation] <- -disseminatedDiff
+      mtx1[yLocation,xLocation] <- disseminatedDiff
+      mtx2[xLocation,yLocation] <- -compositeDiff
+      mtx2[yLocation,xLocation] <- compositeDiff
+      mtx3[xLocation,yLocation] <- -overallDiff
+      mtx3[yLocation,xLocation] <- overallDiff
       assign("contourValuesDisseminated", value = mtx1, envir = .GlobalEnv)
       assign("contourValuesComposite", value = mtx2, envir = .GlobalEnv)
       assign("contourValuesOverall", value = mtx3, envir = .GlobalEnv)
@@ -38,8 +38,10 @@ differenceAndRatioContoursTest <- function(mtx1,mtx2,mtx3){
 cols = rev(colorRampPalette(c("slateblue4",'slategray1'))(20))
 #cols = rev(colorRampPalette(c('#e66101', '#fdb863', '#b2abd2', '#5e3c99'))(20))
 
-png("DisseminatedContourFilled.png",res=600,height=8.5,width=11,units="in")
-filled.contour(x = coverageLevels, y = coverageLevels, z = as.matrix(contourValuesDisseminated), xlab =expression(alpha), ylab = expression(paste(alpha,"'",sep = "")))
+png("DisseminatedContourFilled0528.png",res=600,height=8.5,width=11,units="in")
+filled.contour(x = coverageLevels, y = coverageLevels, z = as.matrix(contourValuesDisseminated),
+               plot.axes = {contour(coverageLevels,coverageLevels,as.matrix(contourValuesDisseminated),nlevels=14,drawlables=TRUE, axes=TRUE,add=TRUE)},
+               xlab =expression(alpha), ylab = expression(paste(alpha,"'",sep = "")))
 #contour(x = coverageLevels, y = coverageLevels, z = as.matrix(contourValuesDisseminated),
 #        xlab =expression(alpha), ylab = expression(paste(alpha,"'",sep = "")))
 dev.off()
@@ -57,5 +59,6 @@ filled.contour(x = coverageLevels, y = coverageLevels,
         z = as.matrix(contourValuesComposite), #col = cols,
         xlab =expression(alpha),
         ylab = expression(paste(alpha,"'",sep = "")))
+contour(x = coverageLevels, y = coverageLevels, z = as.matrix(contourValuesComposite),add=T)
 dev.off()
 

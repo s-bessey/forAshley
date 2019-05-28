@@ -2,6 +2,14 @@ N<-11245
 # total number of agents in run isn't in the file, so set it here for ease
 # of changing as necessary
 library(dplyr)
+acts<-read.table('retention_30/results/componentReport_ALL.txt',header=T)
+acts_reduced<-acts[,!names(acts) %in% c("rseed","pseed")]
+write.table(acts_reduced,"retention_30_reduced.txt",row.names=F)
+estimators(acts_reduced,'retention_30')
+write.table(riskretention_30,"retention_30.txt",row.names=F)
+rm()
+
+
 treatment10<- read.table("reduced_24_0.1.txt",header = T)
 treatment20<- read.table("reduced_24_0.2.txt",header = T)
 treatment30<- read.table("reduced_24_0.3.txt",header = T)
@@ -11,6 +19,8 @@ treatment60<- read.table("reduced_24_0.6.txt",header = T)
 treatment70<- read.table("reduced_24_0.7.txt",header = T)
 treatment80<- read.table("reduced_24_0.8.txt",header = T)
 treatment90<- read.table("reduced_24_0.9.txt",header = T)
+
+actsDouble70_reduced<-actsDouble_70[,!(names(actsDouble_70) %in% c("rseed","pseed"))]
 
 for (i in 1:ncol(treatment)){
   for (j in 1:nrow(treatment)){
