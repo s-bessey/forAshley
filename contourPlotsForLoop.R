@@ -1,3 +1,10 @@
+contourValuesDisseminated <- as.data.frame(matrix(nrow=9,ncol=9))
+coverageLevels <- seq(.1,.9, by = .1)
+rownames(contourValuesDisseminated) <- coverageLevels
+colnames(contourValuesDisseminated) <- coverageLevels
+contourValuesComposite <- contourValuesDisseminated
+contourValuesOverall <- contourValuesDisseminated
+
 differenceAndRatioContoursTest <- function(mtx1,mtx2,mtx3){
   riskNames <- list()
   for (i in 1:9){
@@ -35,30 +42,34 @@ differenceAndRatioContoursTest <- function(mtx1,mtx2,mtx3){
       
   }
 }
+differenceAndRatioContoursTest(contourValuesDisseminated,contourValuesComposite,contourValuesOverall)
+
 cols = rev(colorRampPalette(c("slateblue4",'slategray1'))(20))
 #cols = rev(colorRampPalette(c('#e66101', '#fdb863', '#b2abd2', '#5e3c99'))(20))
 
-png("DisseminatedContourFilled0528.png",res=600,height=8.5,width=11,units="in")
+png("DisseminatedContourFilled0603.png",res=600,height=8.5,width=11,units="in")
 filled.contour(x = coverageLevels, y = coverageLevels, z = as.matrix(contourValuesDisseminated),
-               plot.axes = {contour(coverageLevels,coverageLevels,as.matrix(contourValuesDisseminated),nlevels=14,drawlables=TRUE, axes=TRUE,add=TRUE)},
-               xlab =expression(alpha), ylab = expression(paste(alpha,"'",sep = "")))
+               plot.axes = {contour(coverageLevels,coverageLevels,as.matrix(contourValuesDisseminated),nlevels=14,drawlabels=TRUE, axes=TRUE,add=TRUE); axis(side = 1,at=seq(.2,.8,by=.1));axis(side=2,at=seq(.2,.8,by=.1))},
+               xlab =expression(alpha), ylab = expression(paste(alpha,"'",sep = "")),axes=T)
 #contour(x = coverageLevels, y = coverageLevels, z = as.matrix(contourValuesDisseminated),
 #        xlab =expression(alpha), ylab = expression(paste(alpha,"'",sep = "")))
 dev.off()
 
 
-png("OverallContour.png",res=600,height=8.5,width=11,units="in")
+png("OverallContour0603.png",res=600,height=8.5,width=11,units="in")
 filled.contour(x = coverageLevels, y = coverageLevels,
-        z = as.matrix(contourValuesOverall), #col = cols,
+        z = as.matrix(contourValuesOverall), nlevels=14, #col = cols,
+        plot.axes = {contour(coverageLevels,coverageLevels,as.matrix(contourValuesOverall),nlevels=14,drawlables=TRUE, axes=TRUE,add=TRUE); axis(side = 1,at=seq(.2,.8,by=.1));axis(side=2,at=seq(.2,.8,by=.1))},
         xlab =expression(alpha),
         ylab = expression(paste(alpha,"'",sep = "")))
 dev.off()
 
-png("CompositeContourFilled.png",res=600,height=8.5,width=11,units="in")
+png("CompositeContourFilled0603.png",res=600,height=8.5,width=11,units="in")
 filled.contour(x = coverageLevels, y = coverageLevels,
-        z = as.matrix(contourValuesComposite), #col = cols,
+        z = as.matrix(contourValuesComposite),nlevels=14, #col = cols,
+        plot.axes = {contour(coverageLevels,coverageLevels,as.matrix(contourValuesComposite),nlevels=14,drawlables=TRUE, axes=TRUE,add=TRUE); axis(side = 1,at=seq(.2,.8,by=.1));axis(side=2,at=seq(.2,.8,by=.1))},
         xlab =expression(alpha),
         ylab = expression(paste(alpha,"'",sep = "")))
-contour(x = coverageLevels, y = coverageLevels, z = as.matrix(contourValuesComposite),add=T)
+
 dev.off()
 
